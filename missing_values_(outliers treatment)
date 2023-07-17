@@ -1,15 +1,48 @@
-def missing(df2):
-    for i in list(df2.columns):
-        if df2[i].isnull().sum() > 0:
-            if df2[i].dtypes == 'float64' or df2[i].dtypes == 'int64':
-                q1 = df2[i].quantile(0.25)
-                q3 = df2[i].quantile(0.75)
-                iqr = q3 - q1
-                upperL = q3+1.5*iqr
-                lowerL = q1-1.5*iqr
-                if df2[i].min()<lowerL or df2[i].max()>upperL:
-                    df2[i].fillna(df2[i].median(),inplace = True)
+def null_handling(df):
+    lis = []    #Initiating list to collect columns containing nulls greater than 40%
+    lis2 = []   #Initiating list to collect columns containing outliers
+    while df.isnull().sum().sum() > 0:
+    
+            a = dict(df.isnull().sum()[df.isnull().sum()>0])
+            b = list(a.keys())
+        
+            for i in b:
+                a=list(df[i].isnull().sum()[df[i].isnull().sum()/df[i].count()*100>40])
+                if a !=[]:
+                #if df[i].isnull().sum()>800:
+                    df.drop([i],axis=1,inplace=True)
+                    lis.append(i)
+                    continue
+                
+                c = dict(df[i].value_counts())
+                d = list(c)
+            
+                if df[i].dtypes == 'float64' or df[i].dtypes == 'int64':
+                    q1 = df[i].quantile(0.25)
+                    q3 = df[i].quantile(0.75)
+                    iqr = q3 - q1
+                    upperL = q3+1.5*iqr
+                    lowerL = q1-1.5*iqr
+                    if df[i].min()<lowerL or df[i].max()>upperL:
+                        df[i].fillna(df[i].median(),inplace = True)
+                        lis2.append(i)
+                        
+                    else:
+                        df[i].fillna(df[i].mean(),inplace = True)
                 else:
-                    df2[i].fillna(df2[i].mean(),inplace = True)
-            else:
-                df2[i].fillna(df2[i].mode()[0],inplace = True)
+                    e = d[0]
+                    df[i].fillna(e,inplace=True)
+                    
+    if len(lis)==1:
+        print(f'Column {lis} had nulls greater than 40% and hence the column is removed\n')
+    elif len(lis)>1:  
+        print(f'Columns {lis} had nulls greater than 40% and hence those columns have been removed\n')
+    if len(lis2)==1:
+        print(f'Column {lis2} had outliers\n')
+    elif len(lis2)>1:
+        print(f'Columns {lis2} had outliers\n')
+        
+    print('All the null values have been handled\n')
+   
+    print('All the other columns have been filled with either the max occuring element or the mean of the column')
+    
