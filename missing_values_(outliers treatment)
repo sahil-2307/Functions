@@ -1,0 +1,15 @@
+def missing(df2):
+    for i in list(df2.columns):
+        if df2[i].isnull().sum() > 0:
+            if df2[i].dtypes == 'float64' or df2[i].dtypes == 'int64':
+                q1 = df2[i].quantile(0.25)
+                q3 = df2[i].quantile(0.75)
+                iqr = q3 - q1
+                upperL = q3+1.5*iqr
+                lowerL = q1-1.5*iqr
+                if df2[i].min()<lowerL or df2[i].max()>upperL:
+                    df2[i].fillna(df2[i].median(),inplace = True)
+                else:
+                    df2[i].fillna(df2[i].mean(),inplace = True)
+            else:
+                df2[i].fillna(df2[i].mode()[0],inplace = True)
