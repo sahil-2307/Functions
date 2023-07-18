@@ -7,7 +7,7 @@ def null_handling(df):
             b = list(a.keys())
         
             for i in b:
-                a=list(df[i].isnull().sum()[df[i].isnull().sum()/df[i].count()*100>40])
+                a=list(df[i].isnull().sum()[df[i].isnull().sum()/len(df[i])*100>40])
                 if a !=[]:
                 #if df[i].isnull().sum()>800:
                     df.drop([i],axis=1,inplace=True)
